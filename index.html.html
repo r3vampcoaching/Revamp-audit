@@ -1,0 +1,803 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<meta name="theme-color" content="#111111">
+<meta name="description" content="Find out exactly which area is keeping you stuck. 10 questions, 2 minutes, instant result.">
+
+<!-- Open Graph — controls how the link preview looks when shared -->
+<meta property="og:title" content="The Revamp Body Audit">
+<meta property="og:description" content="Find out exactly which area is keeping you stuck. 10 questions, 2 minutes, instant result.">
+<meta property="og:type" content="website">
+<meta property="og:image" content="https://bit.ly/R3vampCoachingInquiry">
+
+<!-- Twitter/X card -->
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="The Revamp Body Audit">
+<meta name="twitter:description" content="Find out exactly which area is keeping you stuck. 10 questions, 2 minutes, instant result.">
+
+<title>The Revamp Body Audit</title>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,700;0,900;1,700&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  :root {
+    --ink: #0D0D0D;
+    --ink-mid: #1A1A1A;
+    --ink-light: #888888;
+    --gold: #D45C00;
+    --gold-light: #F06A00;
+    --dark: #0A0A0A;
+    --dark-2: #111111;
+    --slide: #FFFFFF;
+    --warm: #F0F0F0;
+    --white: #FFFFFF;
+  }
+
+  body {
+    background: #111111;
+    font-family: 'DM Sans', sans-serif;
+    min-height: 100vh;
+    display: flex;
+    align-items: flex-start;
+    justify-content: center;
+    padding: 0;
+    margin: 0;
+  }
+
+  .shell {
+    width: 100%;
+    max-width: 520px;
+    min-height: 100vh;
+  }
+
+  .screen { display: none; }
+  .screen.active { display: flex; flex-direction: column; animation: fadeIn 0.35s ease forwards; }
+  #screen-intro.screen.active, #screen-result.screen.active { display: block; }
+
+  @keyframes fadeIn {
+    from { opacity: 0; transform: translateY(10px); }
+    to   { opacity: 1; transform: translateY(0); }
+  }
+
+  /* ── INTRO ── */
+  .intro-card {
+    background: var(--dark-2);
+    padding: 60px 36px 52px;
+    position: relative;
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+  }
+
+  .intro-card::before {
+    content: '';
+    position: absolute;
+    top: 0; left: 0; right: 0;
+    height: 3px;
+    background: linear-gradient(90deg, transparent, var(--gold), transparent);
+  }
+
+  .brand-label {
+    font-size: 10px;
+    letter-spacing: 0.3em;
+    text-transform: uppercase;
+    color: var(--gold);
+    font-weight: 600;
+    margin-bottom: 28px;
+  }
+
+  .intro-card h1 {
+    font-family: 'Playfair Display', serif;
+    font-size: 36px;
+    line-height: 1.15;
+    color: var(--white);
+    font-weight: 900;
+    margin-bottom: 16px;
+  }
+
+  .intro-card h1 em { font-style: italic; color: var(--gold-light); }
+
+  .intro-card p {
+    font-size: 14.5px;
+    line-height: 1.68;
+    color: rgba(250,250,248,0.58);
+    font-weight: 300;
+    margin-bottom: 32px;
+  }
+
+  .intro-meta {
+    font-size: 11px;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    color: rgba(250,250,248,0.25);
+    margin-bottom: 28px;
+  }
+
+  .btn-gold {
+    display: block;
+    width: 100%;
+    background: var(--gold);
+    color: var(--dark);
+    font-size: 11px;
+    font-weight: 600;
+    letter-spacing: 0.22em;
+    text-transform: uppercase;
+    padding: 16px;
+    text-align: center;
+    cursor: pointer;
+    border: none;
+    font-family: 'DM Sans', sans-serif;
+    transition: background 0.2s;
+  }
+
+  .btn-gold:hover { background: var(--gold-light); }
+
+  /* ── QUESTION ── */
+  .q-header {
+    background: var(--dark-2);
+    padding: 26px 36px 22px;
+    position: relative;
+  }
+
+  .q-header::before {
+    content: '';
+    position: absolute;
+    top: 0; left: 0; right: 0;
+    height: 3px;
+    background: linear-gradient(90deg, transparent, var(--gold), transparent);
+  }
+
+  .q-brand {
+    font-size: 10px;
+    letter-spacing: 0.28em;
+    text-transform: uppercase;
+    color: var(--gold);
+    font-weight: 600;
+    margin-bottom: 14px;
+  }
+
+  .progress-track {
+    height: 2px;
+    background: rgba(255,255,255,0.08);
+    width: 100%;
+    margin-bottom: 14px;
+    display: flex;
+    gap: 3px;
+  }
+
+  .progress-segment {
+    flex: 1;
+    height: 100%;
+    background: rgba(255,255,255,0.08);
+    transition: background 0.3s;
+  }
+
+  .progress-segment.done { background: var(--gold); }
+  .progress-segment.active { background: rgba(166,124,58,0.45); }
+
+  .q-meta {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
+
+  .q-section-label {
+    font-size: 10px;
+    letter-spacing: 0.18em;
+    text-transform: uppercase;
+    color: rgba(255,255,255,0.35);
+    font-weight: 500;
+  }
+
+  .q-counter {
+    font-size: 10px;
+    letter-spacing: 0.14em;
+    color: rgba(255,255,255,0.25);
+  }
+
+  .q-body {
+    background: var(--slide);
+    padding: 34px 32px 38px;
+  }
+
+  .q-category {
+    font-size: 11px;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    color: var(--ink);
+    font-weight: 600;
+    padding-bottom: 6px;
+    border-bottom: 2px solid var(--gold);
+    display: inline-block;
+    margin-bottom: 20px;
+  }
+
+  .q-text {
+    font-family: 'Playfair Display', serif;
+    font-size: 21px;
+    line-height: 1.35;
+    color: var(--ink);
+    font-weight: 700;
+    margin-bottom: 26px;
+  }
+
+  .options { display: flex; flex-direction: column; gap: 9px; }
+
+  .option {
+    background: var(--warm);
+    border: 1.5px solid transparent;
+    padding: 13px 16px;
+    cursor: pointer;
+    display: flex;
+    align-items: flex-start;
+    gap: 13px;
+    transition: all 0.16s;
+  }
+
+  .option:hover { border-color: var(--gold); background: #E8E8E8; }
+
+  .option.selected { border-color: var(--gold); background: var(--white); }
+
+  .opt-letter {
+    min-width: 24px;
+    height: 24px;
+    background: var(--ink);
+    color: var(--white);
+    font-size: 10px;
+    font-weight: 600;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+    margin-top: 1px;
+    transition: background 0.16s;
+  }
+
+  .option.selected .opt-letter { background: var(--gold); }
+
+  .opt-text {
+    font-size: 13.5px;
+    line-height: 1.52;
+    color: var(--ink-mid);
+    font-weight: 300;
+  }
+
+  .option.selected .opt-text { color: var(--ink); font-weight: 400; }
+
+  .q-nav {
+    background: var(--warm);
+    padding: 18px 36px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
+
+  .q-nav-count {
+    font-size: 11px;
+    color: var(--ink-light);
+    letter-spacing: 0.1em;
+  }
+
+  .btn-next {
+    background: var(--ink);
+    color: var(--white);
+    font-size: 10.5px;
+    font-weight: 600;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    padding: 13px 26px;
+    cursor: pointer;
+    border: none;
+    font-family: 'DM Sans', sans-serif;
+    opacity: 0.25;
+    pointer-events: none;
+    transition: all 0.2s;
+  }
+
+  .btn-next.ready { opacity: 1; pointer-events: all; }
+  .btn-next.ready:hover { background: var(--gold); color: var(--dark); }
+
+  /* ── RESULT ── */
+  .result-card {
+    background: var(--dark-2);
+    padding: 52px 36px 60px;
+    position: relative;
+    min-height: 100vh;
+  }
+
+  .result-card::before {
+    content: '';
+    position: absolute;
+    top: 0; left: 0; right: 0;
+    height: 3px;
+    background: linear-gradient(90deg, transparent, var(--gold), transparent);
+  }
+
+  .result-eyebrow {
+    font-size: 10px;
+    letter-spacing: 0.28em;
+    text-transform: uppercase;
+    color: var(--gold);
+    font-weight: 600;
+    margin-bottom: 20px;
+  }
+
+  .result-label {
+    font-size: 11px;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    color: var(--white);
+    font-weight: 600;
+    padding-bottom: 6px;
+    border-bottom: 2px solid var(--gold);
+    display: inline-block;
+    margin-bottom: 18px;
+  }
+
+  .result-title {
+    font-family: 'Playfair Display', serif;
+    font-size: 28px;
+    line-height: 1.22;
+    color: var(--white);
+    font-weight: 900;
+    margin-bottom: 8px;
+  }
+
+  .result-title em { font-style: italic; color: var(--gold-light); }
+
+  .result-body {
+    font-size: 14.5px;
+    line-height: 1.72;
+    color: rgba(250,250,248,0.6);
+    font-weight: 300;
+    margin-bottom: 22px;
+  }
+
+  .result-body strong { color: var(--white); font-weight: 500; }
+
+  .result-fix {
+    background: rgba(255,255,255,0.05);
+    border-left: 3px solid var(--gold);
+    padding: 16px 18px;
+    margin-bottom: 28px;
+  }
+
+  .fix-label {
+    font-size: 9.5px;
+    letter-spacing: 0.22em;
+    text-transform: uppercase;
+    color: var(--gold-light);
+    font-weight: 600;
+    margin-bottom: 8px;
+  }
+
+  .fix-text {
+    font-size: 13.5px;
+    line-height: 1.62;
+    color: rgba(250,250,248,0.78);
+    font-weight: 300;
+  }
+
+  /* score bars */
+  .score-section { margin-bottom: 28px; }
+
+  .score-title {
+    font-size: 10px;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    color: rgba(250,250,248,0.28);
+    margin-bottom: 12px;
+  }
+
+  .score-row {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    margin-bottom: 9px;
+  }
+
+  .score-name {
+    font-size: 10px;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: rgba(250,250,248,0.35);
+    width: 100px;
+    flex-shrink: 0;
+  }
+
+  .score-bar {
+    flex: 1;
+    height: 3px;
+    background: rgba(255,255,255,0.07);
+  }
+
+  .score-fill {
+    height: 100%;
+    background: rgba(166,124,58,0.45);
+    transition: width 1s ease;
+  }
+
+  .score-fill.weakest { background: var(--gold-light); }
+
+  .score-pct {
+    font-size: 10px;
+    color: rgba(250,250,248,0.28);
+    width: 32px;
+    text-align: right;
+  }
+
+  .btn-ghost {
+    display: block;
+    width: 100%;
+    background: transparent;
+    color: rgba(250,250,248,0.25);
+    font-size: 10px;
+    font-weight: 500;
+    letter-spacing: 0.18em;
+    text-transform: uppercase;
+    padding: 13px;
+    text-align: center;
+    cursor: pointer;
+    border: 1px solid rgba(255,255,255,0.1);
+    font-family: 'DM Sans', sans-serif;
+    margin-top: 10px;
+    transition: all 0.2s;
+  }
+
+  .btn-ghost:hover { color: var(--white); border-color: rgba(255,255,255,0.3); }
+</style>
+</head>
+<body>
+<div class="shell">
+
+  <!-- INTRO -->
+  <div class="screen active" id="screen-intro">
+    <div class="intro-card">
+      <div class="brand-label">Revamp Coaching</div>
+      <h1>The Revamp<br><em>Body Audit</em></h1>
+      <p>10 questions across 4 areas. Find out exactly which one is keeping you stuck so you know what to fix first.</p>
+      <div class="intro-meta">10 questions &nbsp;&bull;&nbsp; 2 minutes &nbsp;&bull;&nbsp; Instant result</div>
+      <button class="btn-gold" onclick="startAudit()">Start the Audit</button>
+    </div>
+  </div>
+
+  <!-- QUESTIONS -->
+  <div class="screen" id="screen-questions">
+    <div class="q-header">
+      <div class="q-brand">Revamp Body Audit</div>
+      <div class="progress-track" id="progress-track"></div>
+      <div class="q-meta">
+        <div class="q-section-label" id="q-section-label"></div>
+        <div class="q-counter" id="q-counter"></div>
+      </div>
+    </div>
+    <div class="q-body">
+      <div class="q-category" id="q-category"></div>
+      <div class="q-text" id="q-text"></div>
+      <div class="options" id="options"></div>
+    </div>
+    <div class="q-nav">
+      <div class="q-nav-count" id="q-nav-count"></div>
+      <button class="btn-next" id="btn-next" onclick="nextQ()">Next</button>
+    </div>
+  </div>
+
+  <!-- RESULT -->
+  <div class="screen" id="screen-result">
+    <div class="result-card">
+      <div class="result-eyebrow">Revamp Coaching</div>
+      <div class="result-label">Your Result</div>
+      <div class="result-title" id="result-title"></div>
+      <div class="result-body" id="result-body"></div>
+      <div class="result-fix">
+        <div class="fix-label">Fix this first</div>
+        <div class="fix-text" id="result-fix"></div>
+      </div>
+      <div class="score-section">
+        <div class="score-title">Your four areas</div>
+        <div id="score-bars"></div>
+      </div>
+      <button class="btn-gold" onclick="ctaClick()">Show me what a game plan would look like</button>
+      <button class="btn-ghost" onclick="resetAudit()">Retake the Audit</button>
+    </div>
+  </div>
+
+</div>
+<script>
+const questions = [
+  // FOOD (3 questions)
+  {
+    cat: 'food',
+    category: 'Food & Calories',
+    section: 'Section 1 of 4',
+    text: 'How would you honestly describe your eating on a typical day?',
+    options: [
+      { l:'A', text:'Real food, no junk. I just can\'t shift weight despite that.', score:3 },
+      { l:'B', text:'Good during the week, falls apart Thursday through Sunday.', score:2 },
+      { l:'C', text:'I graze and grab whatever\'s around. Big meal at night.', score:1 },
+      { l:'D', text:'No idea. I don\'t track and couldn\'t tell you what I ate yesterday.', score:0 },
+    ]
+  },
+  {
+    cat: 'food',
+    category: 'Food & Calories',
+    section: 'Section 1 of 4',
+    text: 'How often do you eat out, order in, or eat pub meals?',
+    options: [
+      { l:'A', text:'Once or twice a week max. I mostly eat at home.', score:3 },
+      { l:'B', text:'3 to 4 times a week. Work lunches, client dinners, the usual.', score:2 },
+      { l:'C', text:'Most days. Lunch is almost always out and dinner is hit and miss.', score:1 },
+      { l:'D', text:'More often than I\'d like to admit. Cooking is the last thing I want to do.', score:0 },
+    ]
+  },
+  {
+    cat: 'food',
+    category: 'Food & Calories',
+    section: 'Section 1 of 4',
+    text: 'What happens to your eating when work goes mental?',
+    options: [
+      { l:'A', text:'Stays pretty consistent. I\'ve got a routine that holds up under pressure.', score:3 },
+      { l:'B', text:'Slips a bit but I get back on track quickly.', score:2 },
+      { l:'C', text:'Goes out the window. Stress eating, skipping meals, whatever\'s nearby.', score:1 },
+      { l:'D', text:'Completely off the rails. Work goes bad, food goes bad, full stop.', score:0 },
+    ]
+  },
+
+  // PROTEIN (2 questions)
+  {
+    cat: 'protein',
+    category: 'Protein',
+    section: 'Section 2 of 4',
+    text: 'How much protein do you reckon you\'re actually getting each day?',
+    options: [
+      { l:'A', text:'150g plus. Protein is always the focus of my meals.', score:3 },
+      { l:'B', text:'Probably 100 to 130g. I think about it but don\'t always nail it.', score:2 },
+      { l:'C', text:'Maybe 60 to 80g. I eat meat but don\'t track protein specifically.', score:1 },
+      { l:'D', text:'No clue. I\'ve never thought about it.', score:0 },
+    ]
+  },
+  {
+    cat: 'protein',
+    category: 'Protein',
+    section: 'Section 2 of 4',
+    text: 'What does a typical lunch or dinner actually look like?',
+    options: [
+      { l:'A', text:'Always built around a solid protein source. Steak, chicken, fish.', score:3 },
+      { l:'B', text:'Usually has some protein but it\'s not always the main focus.', score:2 },
+      { l:'C', text:'Mixed bag. Sandwiches, pasta, whatever\'s easy. Protein is an afterthought.', score:1 },
+      { l:'D', text:'Pub meal, takeaway, whatever. Protein content is the last thing on my mind.', score:0 },
+    ]
+  },
+
+  // ALCOHOL (3 questions)
+  {
+    cat: 'alcohol',
+    category: 'Alcohol & Recovery',
+    section: 'Section 3 of 4',
+    text: 'How often are you drinking during the week?',
+    options: [
+      { l:'A', text:'Rarely. Maybe a couple on the weekend and that\'s it.', score:3 },
+      { l:'B', text:'2 to 3 nights. A few beers or a scotch after a big day.', score:2 },
+      { l:'C', text:'Most nights. It\'s how I switch off from work.', score:1 },
+      { l:'D', text:'Every night plus big sessions on weekends. It\'s part of the lifestyle.', score:0 },
+    ]
+  },
+  {
+    cat: 'alcohol',
+    category: 'Alcohol & Recovery',
+    section: 'Section 3 of 4',
+    text: 'How would you rate your sleep quality?',
+    options: [
+      { l:'A', text:'Solid. I wake up feeling rested most mornings.', score:3 },
+      { l:'B', text:'Up and down. Good nights and bad nights.', score:2 },
+      { l:'C', text:'Pretty average. I wake up tired more often than not.', score:1 },
+      { l:'D', text:'Terrible. I\'m running on 5 to 6 broken hours. Have been for years.', score:0 },
+    ]
+  },
+  {
+    cat: 'alcohol',
+    category: 'Alcohol & Recovery',
+    section: 'Section 3 of 4',
+    text: 'How do you feel most afternoons around 2 to 4pm?',
+    options: [
+      { l:'A', text:'Still sharp. Energy holds up through the afternoon without needing anything.', score:3 },
+      { l:'B', text:'Bit flat but manageable. Another coffee usually sorts it.', score:2 },
+      { l:'C', text:'Hits a wall most days. Hard to focus, need sugar or caffeine to push through.', score:1 },
+      { l:'D', text:'Smashed. I\'m basically functioning on fumes by mid afternoon.', score:0 },
+    ]
+  },
+
+  // CONSISTENCY (2 questions)
+  {
+    cat: 'consistency',
+    category: 'Consistency',
+    section: 'Section 4 of 4',
+    text: 'What happens when your week goes sideways?',
+    options: [
+      { l:'A', text:'I adapt. One bad meal or missed session doesn\'t derail the whole week.', score:3 },
+      { l:'B', text:'I try to salvage it but usually lose momentum halfway through.', score:2 },
+      { l:'C', text:'One bad day writes off the week. I reset on Monday.', score:1 },
+      { l:'D', text:'I\'ve been in a restart cycle for months. Get going, something hits, back to zero.', score:0 },
+    ]
+  },
+  {
+    cat: 'consistency',
+    category: 'Consistency',
+    section: 'Section 4 of 4',
+    text: 'How long does your longest recent stretch of consistent training actually last?',
+    options: [
+      { l:'A', text:'6 months plus. Training is non-negotiable regardless of what\'s going on.', score:3 },
+      { l:'B', text:'A few months before something knocks it. I get back to it eventually.', score:2 },
+      { l:'C', text:'A few weeks. Always something that breaks the run.', score:1 },
+      { l:'D', text:'Barely a week or two. I haven\'t had a real consistent run in years.', score:0 },
+    ]
+  },
+];
+
+const resultData = {
+  food: {
+    title: 'Your food is the leak.',
+    body: 'You\'re training consistently but <strong>your calories are quietly working against you.</strong> It\'s not junk food causing the problem. It\'s the pub meals, the big takeaway nights, the eating that goes sideways under pressure. None of it feels like a big deal in the moment. All of it adds up to more than your body needs right now.',
+    fix: 'Get a clear picture of what you\'re actually eating for two weeks. Not to track forever. Just enough to see where the calories are coming from. Once you see it, it\'s hard to unsee.',
+  },
+  protein: {
+    title: 'Protein is the missing piece.',
+    body: 'You\'re putting in the sessions but <strong>your body doesn\'t have the raw material to respond.</strong> At 35 plus, your body needs significantly more protein than it did when you were younger and weight just moved. Most blokes are hitting 60 to 80g a day. You need closer to 160 to 200g to actually hold muscle and get lean at the same time.',
+    fix: 'Start building every single meal around a protein source first. Steak, chicken, fish, eggs. Hit the protein number and let everything else fall into place around it.',
+  },
+  alcohol: {
+    title: 'The drinking and the recovery are doing the damage.',
+    body: 'The training is there. The intention is there. But <strong>your body isn\'t getting the recovery it needs to actually change.</strong> Alcohol suppresses testosterone, spikes oestrogen, fragments sleep, and makes your body burn it before it ever touches fat. Add broken sleep on top and your body is fighting itself every week regardless of what you do in the gym.',
+    fix: 'Pull the drinking back to weekends only for 4 weeks and watch what happens to your body composition, your energy, and your sleep. The results will be the most convincing argument you\'ve ever seen.',
+  },
+  consistency: {
+    title: 'The all or nothing cycle is keeping you stuck.',
+    body: 'You\'re not lacking discipline. You run a business. You know how to execute. <strong>The problem is you\'re applying a business mindset to your body.</strong> All in or nothing. And every time life hits, the whole thing resets. A business can absorb a hard reset. Your body compounds in the wrong direction every time you start over.',
+    fix: 'Stop waiting for the perfect week. A 70 percent week done consistently beats a perfect week you never actually have. The goal is to never fully stop. Even a bad week where you train twice and eat okay is progress.',
+  },
+};
+
+const categoryNames = {
+  food: 'Food',
+  protein: 'Protein',
+  alcohol: 'Alcohol & Recovery',
+  consistency: 'Consistency',
+};
+
+let current = 0;
+let answers = {};
+let selectedScore = null;
+
+function showScreen(id) {
+  document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+  document.getElementById(id).classList.add('active');
+}
+
+function startAudit() {
+  current = 0;
+  answers = { food: 0, protein: 0, alcohol: 0, consistency: 0 };
+  selectedScore = null;
+  buildProgressTrack();
+  renderQuestion();
+  showScreen('screen-questions');
+}
+
+function buildProgressTrack() {
+  const track = document.getElementById('progress-track');
+  track.innerHTML = '';
+  questions.forEach((_, i) => {
+    const seg = document.createElement('div');
+    seg.className = 'progress-segment';
+    seg.id = 'seg-' + i;
+    track.appendChild(seg);
+  });
+}
+
+function updateProgress() {
+  questions.forEach((_, i) => {
+    const seg = document.getElementById('seg-' + i);
+    if (!seg) return;
+    seg.className = 'progress-segment' + (i < current ? ' done' : i === current ? ' active' : '');
+  });
+}
+
+function renderQuestion() {
+  const q = questions[current];
+  selectedScore = null;
+
+  updateProgress();
+  document.getElementById('q-section-label').textContent = q.section;
+  document.getElementById('q-counter').textContent = 'Question ' + (current + 1) + ' of ' + questions.length;
+  document.getElementById('q-nav-count').textContent = (current + 1) + ' / ' + questions.length;
+  document.getElementById('q-category').textContent = q.category;
+  document.getElementById('q-text').textContent = q.text;
+
+  const optContainer = document.getElementById('options');
+  optContainer.innerHTML = '';
+  q.options.forEach((opt, idx) => {
+    const div = document.createElement('div');
+    div.className = 'option';
+    div.innerHTML = '<div class="opt-letter">' + opt.l + '</div><div class="opt-text">' + opt.text + '</div>';
+    div.onclick = () => selectOption(div, opt.score, idx);
+    optContainer.appendChild(div);
+  });
+
+  const btn = document.getElementById('btn-next');
+  btn.classList.remove('ready');
+  btn.textContent = current === questions.length - 1 ? 'See My Result' : 'Next';
+}
+
+function selectOption(el, score, idx) {
+  document.querySelectorAll('.option').forEach(o => o.classList.remove('selected'));
+  el.classList.add('selected');
+  selectedScore = score;
+  document.getElementById('btn-next').classList.add('ready');
+}
+
+function nextQ() {
+  if (selectedScore === null) return;
+  const cat = questions[current].cat;
+  answers[cat] += selectedScore;
+  current++;
+  if (current >= questions.length) {
+    showResult();
+  } else {
+    renderQuestion();
+  }
+}
+
+function showResult() {
+  // Max scores per category: food=9, protein=6, alcohol=9, consistency=6
+  const maxes = { food: 9, protein: 6, alcohol: 9, consistency: 6 };
+  const pcts = {};
+  Object.keys(answers).forEach(k => {
+    pcts[k] = Math.round((answers[k] / maxes[k]) * 100);
+  });
+
+  // Find weakest
+  let weakest = Object.keys(pcts).reduce((a, b) => pcts[a] <= pcts[b] ? a : b);
+
+  const res = resultData[weakest];
+  document.getElementById('result-title').innerHTML = res.title;
+  document.getElementById('result-body').innerHTML = res.body;
+  document.getElementById('result-fix').textContent = res.fix;
+
+  // Score bars — weakest highlighted
+  const barsEl = document.getElementById('score-bars');
+  barsEl.innerHTML = '';
+  Object.keys(pcts).forEach(k => {
+    const row = document.createElement('div');
+    row.className = 'score-row';
+    const isWeak = k === weakest;
+    row.innerHTML =
+      '<div class="score-name">' + categoryNames[k] + '</div>' +
+      '<div class="score-bar"><div class="score-fill' + (isWeak ? ' weakest' : '') + '" style="width:0%" data-pct="' + pcts[k] + '"></div></div>' +
+      '<div class="score-pct">' + pcts[k] + '%</div>';
+    barsEl.appendChild(row);
+  });
+
+  showScreen('screen-result');
+
+  // Animate bars after paint
+  requestAnimationFrame(() => {
+    requestAnimationFrame(() => {
+      document.querySelectorAll('.score-fill').forEach(el => {
+        el.style.width = el.dataset.pct + '%';
+      });
+    });
+  });
+}
+
+function ctaClick() {
+  window.open('https://bit.ly/R3vampCoachingInquiry', '_blank');
+}
+
+function resetAudit() {
+  showScreen('screen-intro');
+}
+</script>
+</body>
+</html>
